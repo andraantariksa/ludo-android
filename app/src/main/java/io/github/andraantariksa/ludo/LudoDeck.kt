@@ -2,39 +2,53 @@ package io.github.andraantariksa.ludo
 
 import android.content.Context
 import android.graphics.*
-import android.util.AttributeSet
-import android.util.Log
-import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 
 class LudoDeck(context: Context): View(context) {
     private var totalPawn = 4
-    var color = Color.BLACK
+    val paintRectOuter = Paint()
+    val paintRectInner = Paint()
+    val rectOuter = Rect(0, 0, 50, 50)
+    val rectInner = Rect(10, 10, 40, 40)
 
     init {
         setWillNotDraw(false)
+
+        paintRectInner.color = Color.WHITE
+    }
+
+    fun isPawnAvailable(): Boolean {
+        return totalPawn > 0
     }
 
     fun dispatchPawn() {
         totalPawn -= 1
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        return super.onTouchEvent(event)
+    fun isOwnedBy(player: Player): Boolean {
+        return player.toColor() == paintRectOuter.color
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        rectOuter.right = widthMeasureSpec
+        rectOuter.bottom = heightMeasureSpec
+
+        val pad = (widthMeasureSpec / 6F).toInt()
+        rectInner.top = pad
+        rectInner.left = pad
+        rectInner.right = widthMeasureSpec - pad
+        rectInner.bottom = heightMeasureSpec - pad
+
+        setMeasuredDimension(widthMeasureSpec, heightMeasureSpec)
     }
 
     override fun onDraw(canvas: Canvas) {
-        Log.d("zzzzz", "Draw")
-        val p = Paint()
-        p.color = color
-        val rect = Rect(0, 0, width, height)
-        canvas.drawRect(rect, p)
-
-        val pad = (width / 6F).toInt()
-        val p2 = Paint()
-        p2.color = Color.WHITE
-        val rect2 = Rect(pad, pad, width - pad, height - pad)
-        canvas.drawRect(rect2, p2)
+        canvas.drawRect(rectOuter, paintRectOuter)
+        canvas.drawRect(rectInner, paintRectInner)
+//        val pad = (width / 6F).toInt()
+//        val p2 = Paint()
+//        p2.color = Color.WHITE
+//        val rect2 = Rect(pad, pad, width - pad, height - pad)
+//        canvas.drawRect(rect2, p2)
     }
 }
